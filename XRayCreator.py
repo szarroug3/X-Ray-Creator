@@ -33,6 +33,8 @@ DRIVE_FIXED       = 3  # The drive has fixed media; for example, a hard disk dri
 DRIVE_REMOTE      = 4  # The drive is a remote (network) drive.
 DRIVE_CDROM       = 5  # The drive is a CD-ROM drive.
 DRIVE_RAMDISK     = 6  # The drive is a RAM disk.
+books_updated = []
+books_skipped = []
 
 # Map drive types to strings
 DRIVE_TYPE_MAP = { DRIVE_UNKNOWN     : 'DRIVE_UNKNOWN',
@@ -104,7 +106,6 @@ def removeBooksWithXRay(drive, books):
 
 # Get ASIN from Amazon
 def getASIN(book):
-	print "Book: " + book
 	query = urllib.urlencode ( { 'q' : "amazon ebook " + book } )
 	response = urllib.urlopen ( 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&' + query).read()
 	json = m_json.loads ( response )
@@ -113,41 +114,61 @@ def getASIN(book):
 		title = result['title']
 		url = result['url']
 		if "amazon" in url:
-			amazon_page = urllib.urlopen(url)
-			page_source = amazon_page.read()
-			index = page_source.find("ASIN.0")
-			if index > 0:
-				ASIN = page_source[index + 15:index + 25]
-				print "Found book on amazon..."
-				print "ASIN: " + ASIN
-		 		return ASIN
-	 		else:
-	 			return -1
+			ASIN = -1
+			for i in range(10):
+				amazon_page = urllib.urlopen(url)
+				page_source = amazon_page.read()
+				index = page_source.find("ASIN.0")
+				if index > 0:
+					ASIN = page_source[index + 15:index + 25]
+					print "Found book on amazon..."
+					print "ASIN: " + ASIN
+		 			return ASIN
+	 		return ASIN
 
+# Update ASIN in book using mobi2mobi
 def updateASIN(book):
-	command = "mobi2mobi " + '\"' + book['book filepath'] + '\"' + " --outfile " + '\"' + book['book filepath'] + "_NEW" + '\"' + " --exthtype asin --exthdata " + book['book ASIN']
+	current_directory = os.path.dirname(os.path.abspath(__file__)) + '\\'
+	print current_directory
+	mobi2mobi_path = current_directory + "MobiPerl\\mobi2mobi.exe"
+	command = mobi2mobi_path + " \"" + book['book filepath'] + "\" --outfile \"" + book['book filepath'] + "_NEW\" --exthtype asin --exthdata " + book['book ASIN']
 	print command
 	execute(command)
 	os.remove(book['book filepath'])
 	os.rename(book['book filepath'] + "_NEW", book['book filepath'])
 
-
+# Update books' ASIN and create x-ray file in appropriate directory
 def updateBooks(books, drive_letter):
 	for book in books:
+		print "Book: " + book['book name']
 		ASIN = getASIN(book['book name'])
 		if ASIN == -1:
 			print "ASIN not found. Skipping book..."
+			books_skipped.append(book)
 		else:
 			book['book ASIN'] = ASIN
 			updateASIN(book)
 			url = getShelfariURL(book)
 			if url == -1:
 				print "Shelfari book not found. Skipping book..."
+				books_skipped.append(book)
 			else:
+				print "Creating X-Ray file..."
 				createXRayFile(book, url)
-	print "Done."
+				books_updated.append(book)
+		print ""
+	print "Done..."
+	if books_updated is not None:
+		print "Books updated: "
+		for book in books_updated:
+			print "\t " + book['book name']
+	if books_skipped is not None:
+		print "Books skipped: "
+		for book in books_updated:
+			print "\t " + book['book name']
 	return
 
+# Searches for shelfari url for book
 def getShelfariURL(book):
 	response = urllib.urlopen ( 'http://www.shelfari.com/search/books?Keywords=' + book['book ASIN'] ).read()
 	page_source = BeautifulSoup(response, "html.parser")
@@ -159,21 +180,22 @@ def getShelfariURL(book):
 				return url
 	return -1
 
+# Creates X-Ray file using XRayBuilder
 def createXRayFile(book, url):
 	current_directory = os.path.dirname(os.path.abspath(__file__)) + '\\'
 	temp_directory = current_directory + "temp" + '\\'
 	temp_book_file = temp_directory + book['book name'].replace(" ", "") + ".mobi"
-	xray_builder_directory = current_directory + "XRayBuilder" + '\\'
-	mobi_unpack_directory = xray_builder_directory + "dist" + '\\' + "kindleunpack.exe"
-	xray_builder_temp_directory = current_directory + "out" + '\\'
+	xray_builder_directory = current_directory + "XRayBuilder\\"
+	mobi_unpack_path = xray_builder_directory + "dist\\kindleunpack.exe"
+	xray_builder_temp_directory = current_directory + "out\\"
 	if not os.path.exists(temp_directory):
 		os.makedirs(temp_directory)
 	shutil.copy2(book['book filepath'], temp_book_file )
-	command = xray_builder_directory + "XRayBuilder.exe" + " -o " + '\"' + book['X-Ray directory'] + '\"' + " -s " + url + " " + '\"' + temp_book_file + '\"' " -u " + '"' + mobi_unpack_directory + '"' + " --unattended"
+	command = xray_builder_directory + "XRayBuilder.exe -o \"" + book['X-Ray directory'] + "\" -s " + url + " \"" + temp_book_file + "\" -u \"" + mobi_unpack_path + "\" --unattended"
 	execute(command)
 	xray_file_name = "XRAY.entities." + book['book ASIN'] + ".asc"
 	xray_file_name_and_dir = book['X-Ray directory'] + '\\' + xray_file_name
-	command = '\"' + xray_builder_directory + "XRay2Converter.exe" + '\"' + " " + '\"' + xray_file_name_and_dir + '\"' + " " + url
+	command = '\"' + xray_builder_directory + "XRay2Converter.exe\" \"" + xray_file_name_and_dir + "\" " + url
 	execute(command)
 	for dirName, subDirList, fileList in os.walk(xray_builder_temp_directory):
 		for fName in fileList:
@@ -182,6 +204,7 @@ def createXRayFile(book, url):
 	shutil.rmtree(temp_directory)
 	shutil.rmtree(xray_builder_temp_directory)
 
+# Execute command line prompt
 def execute(command):
 	popen = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 	lines_iterator = iter(popen.stdout.readline, b"")
