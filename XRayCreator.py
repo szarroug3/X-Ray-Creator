@@ -157,15 +157,6 @@ def updateBooks(books, drive_letter):
 				createXRayFile(book, url)
 				books_updated.append(book)
 		print ""
-	print "Done..."
-	if books_updated is not None:
-		print "Books updated: "
-		for book in books_updated:
-			print "\t " + book['book name']
-	if books_skipped is not None:
-		print "Books skipped: "
-		for book in books_updated:
-			print "\t " + book['book name']
 	return
 
 # Searches for shelfari url for book
@@ -229,3 +220,12 @@ else:
 	else:
 		print "Updating ASIN for books..."
 		updateBooks(books, drive_letter)
+print "Done..."
+if books_updated:
+	print "Books updated: "
+	for book in books_updated:
+		print "\t " + book['book name']
+if books_skipped:
+	print "Books skipped: "
+	for book in books_skipped:
+		print "\t " + book['book name']
