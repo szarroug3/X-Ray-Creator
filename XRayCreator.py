@@ -188,6 +188,7 @@ def createXRayFile(book, url):
 	xray_builder_directory = current_directory + "XRayBuilder\\"
 	mobi_unpack_path = xray_builder_directory + "dist\\kindleunpack.exe"
 	xray_builder_temp_directory = current_directory + "out\\"
+	xray_builder_ext_directory = current_directory + "ext\\"
 	if not os.path.exists(temp_directory):
 		os.makedirs(temp_directory)
 	shutil.copy2(book['book filepath'], temp_book_file )
@@ -203,6 +204,7 @@ def createXRayFile(book, url):
 				shutil.copy2(dirName + fName, xray_file_name_and_dir)
 	shutil.rmtree(temp_directory)
 	shutil.rmtree(xray_builder_temp_directory)
+	shutil.rmtree(xray_builder_ext_directory)
 
 # Execute command line prompt
 def execute(command):
