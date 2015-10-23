@@ -20,9 +20,7 @@ import ctypes
 import urllib
 import json as m_json
 import shutil
-import time
 import subprocess
-import pexpect
 from bs4 import BeautifulSoup
 
 # Drive types
@@ -102,6 +100,7 @@ def removeBooksWithXRay(drive, books):
 	print "Books without X-Ray files: "
 	for book in books:
 		print book['book name']
+	print
 	return books
 
 # Get ASIN from Amazon
