@@ -202,7 +202,7 @@ def execute(command):
 	lines_iterator = iter(popen.stdout.readline, b"")
 	for line in lines_iterator:
 		print line
-		if "Press Enter to exit..." in line:
+		if "Press Enter to exit" in line:
 			popen.communicate("\n")[0]
 
 drive_letter = findKindle()
