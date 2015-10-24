@@ -18,6 +18,9 @@ Requirements:
   
 Program usage:  
 python xraycreatory.py [-u] [-ua] [--spoilers]  
+Not using any switches will search the kindle for books without X-Ray Files,  
+update the books' ASIN then create an X-Ray file for it on the kindle.  
+*NOTE: You must have kindle connected before running program.  
 *NOTE: -ua will take precedence over -u  
 -ua				Deletes all X-Ray files and recreates them  
 -u 				Will give you a list of all books on kindle and asks you to  
