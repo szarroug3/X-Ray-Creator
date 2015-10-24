@@ -308,18 +308,30 @@ def getUpdateArguments(args, books):
 	else:
 		return "none"
 
+def printHelp():
+	print "python xraycreatory.py [-u] [-ua]"
+	print "*NOTE: -ua will take precedence over"
+	print "-ua\t\tDeletes all X-Ray files and recreates them"
+	print "-u\t\tWill give you a list of all books on kindle and asks you to"
+	print "\t\treturn a list of book numbers for the books you want to update"
+	print "--spoilers\t\tUse descriptions that contain spoilers"
+	print "\t\tDefault behaviour is to use spoiler-free descriptions"
+
 # Main
-drive_letter = findKindle()
-if drive_letter is None:
-	print "Error: Kindle not found."
+if "-h" in sys.argv or "-help" in args or "-?" in args:
+	printHelp()
 else:
-	print "Kindle found..."
-	print "Getting list of books..."
-	books = getBooks(drive_letter)
-	update = getUpdateArguments(sys.argv, books)
-	print update
-	if update == "none": normalOperation(books)
-	elif update == "all": updateAllBooks(books)
+	drive_letter = findKindle()
+	if drive_letter is None:
+		print "Error: Kindle not found."
 	else:
-		books_to_update = createListOfBooksToUpdate(books, update)
-		updateBooks(books_to_update)
+		print "Kindle found..."
+		print "Getting list of books..."
+		books = getBooks(drive_letter)
+		update = getUpdateArguments(sys.argv, books)
+		print update
+		if update == "none": normalOperation(books)
+		elif update == "all": updateAllBooks(books)
+		else:
+			books_to_update = createListOfBooksToUpdate(books, update)
+			updateBooks(books_to_update)
