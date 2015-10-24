@@ -291,13 +291,13 @@ def updateBooks(books):
 
 # Get arguments from command line
 def getUpdateArguments(args, books):
-	print "Number of args: ", len(args), 'arguments'
-	print "Argument list: ", str(args)
 	if args.count == 1:
 		return "none"
-	elif "-ua" in args:
+	if "--spoilers" in args:
+		spoilers = true
+	if "-ua" in args:
 		return "all"
-	elif "-u" in args and len(args) == 2:
+	elif "-u" in args:
 		print
 		for book in books:
 			print book['book number'] + ". " + book['book name']
