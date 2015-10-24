@@ -17,7 +17,7 @@ Requirements:
   * https://www.python.org/downloads/release/python-279/  
   
 Program usage:  
-python xraycreatory.py [-u] [-ua]  
+python xraycreatory.py [-u] [-ua] [--spoilers]  
 *NOTE: -ua will take precedence over -u  
 -ua				Deletes all X-Ray files and recreates them  
 -u 				Will give you a list of all books on kindle and asks you to  
