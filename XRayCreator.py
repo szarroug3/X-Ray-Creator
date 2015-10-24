@@ -34,6 +34,7 @@ DRIVE_CDROM       = 5  # The drive is a CD-ROM drive.
 DRIVE_RAMDISK     = 6  # The drive is a RAM disk.
 books_updated = []
 books_skipped = []
+spoilers = False
 
 # Map drive types to strings
 DRIVE_TYPE_MAP = { DRIVE_UNKNOWN     : 'DRIVE_UNKNOWN',
@@ -186,6 +187,8 @@ def createXRayFile(book, url):
 		os.makedirs(temp_directory)
 	shutil.copy2(book['book filepath'], temp_book_file )
 	command = xray_builder_directory + "XRayBuilder.exe -o \"" + book['X-Ray directory'] + "\" -s " + url + " \"" + temp_book_file + "\" -u \"" + mobi_unpack_path + "\" --unattended"
+	if spoilers:
+		command = command + " --spoilers"
 	execute(command)
 	xray_file_name = "XRAY.entities." + book['book ASIN'] + ".asc"
 	xray_file_name_and_dir = book['X-Ray directory'] + '\\' + xray_file_name
