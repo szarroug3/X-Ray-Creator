@@ -1,6 +1,5 @@
 *** X-Ray Creator ***  
-A console application that updates ASIN and creates  
-or updates X-Ray files for books on a kindle  
+A console application that updates ASIN and creates or updates X-Ray files for books on a kindle  
 Created by S. Zarroug  
 Original X-Ray Builder script  by Nick Niemi - ephemeral.vilification@gmail.com  
 https://github.com/Ephemerality/xray-builder  
@@ -30,8 +29,6 @@ update the books' ASIN then create an X-Ray file for it on the kindle.
 *NOTE: You must have kindle connected before running program.  
 *NOTE: -ua will take precedence over -u  
   
-Books should be DRM-free. If you create an X-Ray file for a book, but still use the DRM copy on your Kindle,  
-you will run into issues where the excerpts do not line up with where they are in the DRM-free version.  
-Chapter detection on DRM books is not supported.  
-
+Books should be DRM-free. If you create an X-Ray file for a book, but still use the DRM copy on your Kindle, you will run into issues where the excerpts do not line up with where they are in the DRM-free version. Chapter detection on DRM books is not supported.  
+  
 Will only work for mobi files.  
