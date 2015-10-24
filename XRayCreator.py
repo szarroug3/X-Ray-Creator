@@ -310,12 +310,18 @@ def getUpdateArguments(args, books):
 
 def printHelp():
 	print "python xraycreatory.py [-u] [-ua]"
-	print "*NOTE: -ua will take precedence over"
+	print
+	print "Not using any switches will search the kindle for books without X-Ray Files,"
+	print "update the books' ASIN then create an X-Ray file for it on the kindle."
+	print
 	print "-ua\t\tDeletes all X-Ray files and recreates them"
 	print "-u\t\tWill give you a list of all books on kindle and asks you to"
 	print "\t\treturn a list of book numbers for the books you want to update"
 	print "--spoilers\t\tUse descriptions that contain spoilers"
 	print "\t\tDefault behaviour is to use spoiler-free descriptions"
+	print
+	print "*NOTE: You must have kindle connected before running program."
+	print "*NOTE: -ua will take precedence over -u"
 
 # Main
 if "-h" in sys.argv or "-help" in args or "-?" in args:
