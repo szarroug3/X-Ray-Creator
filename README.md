@@ -26,7 +26,7 @@ python xraycreatory.py [-u] [-ua] [--spoilers]
 				Default behaviour is to use spoiler-free descriptions  
   
 Books should be DRM-free. If you create an X-Ray file for a book, but still use the DRM copy on your Kindle,  
-you will run into issues where the excerpts do not line up do where they are in the DRM-free version.  
+you will run into issues where the excerpts do not line up with where they are in the DRM-free version.  
 Chapter detection on DRM books is not supported.  
 
 Will only work for mobi files.  
