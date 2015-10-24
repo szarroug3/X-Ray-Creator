@@ -1,5 +1,5 @@
 *** X-Ray Creator ***  
-A console application that searches updates ASIN  
+A console application that updates ASIN  
 and creates or updates X-Ray files for books on a kindle  
 Created by S. Zarroug  
 Original X-Ray Builder script  by Nick Niemi - ephemeral.vilification@gmail.com  
