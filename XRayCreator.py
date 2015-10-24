@@ -105,7 +105,8 @@ def removeBooksWithXRay(drive, books):
 
 # Get ASIN from Amazon
 def getASIN(book):
-	query = urllib.urlencode ( { 'q' : "amazon ebook " + book } )
+	ASIN = -1
+	query = urllib.urlencode ( { 'q' : "amazon kindle \"ebook\" " + book } )
 	response = urllib.urlopen ( 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&' + query).read()
 	json = m_json.loads ( response )
 	results = json [ 'responseData' ] [ 'results' ]
@@ -113,16 +114,22 @@ def getASIN(book):
 		title = result['title']
 		url = result['url']
 		if "amazon" in url:
-			ASIN = -1
-			for i in range(10):
-				amazon_page = urllib.urlopen(url)
-				page_source = amazon_page.read()
-				index = page_source.find("ASIN.0")
-				if index > 0:
-					ASIN = page_source[index + 15:index + 25]
-					print "Found book on amazon..."
-					print "ASIN: " + ASIN
-		 			return ASIN
+			if "/dp/" in url:
+				index = url.find("/dp/")
+				ASIN = url[index + 4 : index + 14]
+				print "Found book on amazon..."
+				print "ASIN: " + ASIN
+	 			return ASIN
+			else:
+				for i in range(10):
+					amazon_page = urllib.urlopen(url)
+					page_source = amazon_page.read()
+					index = page_source.find("ASIN.0")
+					if index > 0:
+						ASIN = page_source[index + 15 : index + 25]
+						print "Found book on amazon..."
+						print "ASIN: " + ASIN
+			 			return ASIN
 	 		return ASIN
 
 # Update ASIN in book using mobi2mobi
