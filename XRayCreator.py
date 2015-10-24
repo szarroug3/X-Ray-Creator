@@ -16,6 +16,7 @@
 """
 
 import os
+import sys
 import ctypes
 import urllib
 import json as m_json
@@ -73,15 +74,18 @@ def get_drive_info():
 def getBooks(drive):
 	books_directory = drive + "documents"
 	books = []
+	index = 1
 	print "Searching for books..."
 	for dirName, subDirList, fileList in os.walk(books_directory):
 		for fName in fileList:
 			if ".mobi" in fName:
 				books.append(
-					{'book name' : fName[:-5],
+					{'book number' : str(index),
+					'book name' : fName[:-5],
 					'book filepath' : dirName[:2] + '\\' + dirName[2:] + '\\' + fName,
 					'book ASIN' : "",
 					'X-Ray directory' : dirName[:2] + '\\' + dirName[2:] + '\\' + fName[:-4] + "sdr"})
+				index = index + 1
 	return books
 
 # Remove books that already have X-Ray files
@@ -91,16 +95,10 @@ def removeBooksWithXRay(drive, books):
 		if ".sdr" in dirName:
 			for fName in fileList:
 				if ".asc" in fName:
-					print "Removing " + dirName[dirName.rfind("\\") + 1:-4] + " from books. X-Ray file found."
 					for book in books:
 						if book['book name'] == dirName[dirName.rfind("\\") + 1:-4]:
 							books.remove(book)
 							continue
-	print
-	print "Books without X-Ray files: "
-	for book in books:
-		print book['book name']
-	print
 	return books
 
 # Get ASIN from Amazon
@@ -135,16 +133,14 @@ def getASIN(book):
 # Update ASIN in book using mobi2mobi
 def updateASIN(book):
 	current_directory = os.path.dirname(os.path.abspath(__file__)) + '\\'
-	print current_directory
 	mobi2mobi_path = current_directory + "MobiPerl\\mobi2mobi.exe"
 	command = mobi2mobi_path + " \"" + book['book filepath'] + "\" --outfile \"" + book['book filepath'] + "_NEW\" --exthtype asin --exthdata " + book['book ASIN']
-	print command
 	execute(command)
 	os.remove(book['book filepath'])
 	os.rename(book['book filepath'] + "_NEW", book['book filepath'])
 
 # Update books' ASIN and create x-ray file in appropriate directory
-def updateBooks(books, drive_letter):
+def updateBooksASIN(books):
 	for book in books:
 		print "Book: " + book['book name']
 		ASIN = getASIN(book['book name'])
@@ -203,6 +199,21 @@ def createXRayFile(book, url):
 	shutil.rmtree(xray_builder_temp_directory)
 	shutil.rmtree(xray_builder_ext_directory)
 
+# Remove X-Ray file for book from kindle
+def removeXRayFile(book):
+	print book['X-Ray directory']
+	for dirName, subDirList, fileList in os.walk(book['X-Ray directory']):
+		for fName in fileList:
+			print fName
+			if ".asc" in fName:
+				print "Deleting X-Ray file for " + book['book name']
+				os.remove(dirName + '\\' + fName)
+
+# Remove all X-Ray Files from kindle
+def removeAllXRayFiles(books):
+	for book in books:
+		removeXRayFile(book)
+
 # Execute command line prompt
 def execute(command):
 	popen = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -212,6 +223,89 @@ def execute(command):
 		if "Press Enter to exit" in line:
 			popen.communicate("\n")[0]
 
+# Create X-Ray files for book without one
+def normalOperation(books):
+	print "Removing books that already have X-Ray files..."
+	books = removeBooksWithXRay(drive_letter, books)
+	print
+	print "Books without X-Ray files: "
+	for book in books:
+		print book['book name']
+	print
+	if not books:
+		print "All books already have X-Ray files..."
+	else:
+		print "Updating ASIN for books..."
+		updateBooksASIN(books)
+	print "Done..."
+	if books_updated:
+		print "Books updated: "
+		for book in books_updated:
+			print "\t " + book['book name']
+	if books_skipped:
+		print "Books skipped: "
+		for book in books_skipped:
+				print "\t " + book['book name']
+
+# Update X-Ray files for all books
+def updateAllBooks(books):
+	removeAllXRayFiles(books)
+	print "Updating ASIN for books..."
+	updateBooksASIN(books)
+	print "Done..."
+	if books_updated:
+		print "Books updated: "
+		for book in books_updated:
+			print "\t " + book['book name']
+	if books_skipped:
+		print "Books skipped: "
+		for book in books_skipped:
+				print "\t " + book['book name']
+
+# Create a list of books from user input
+def createListOfBooksToUpdate(books, book_numbers):
+	books_to_update = []
+	print book_numbers
+	for number in book_numbers:
+		books_to_update.append(books[int(number) - 1])
+	return books_to_update
+
+# Update X-Ray file for specified books
+def updateBooks(books):
+	for book in books:
+		removeXRayFile(book)
+	print "Updating ASIN for books..."
+	updateBooksASIN(books)
+	print "Done..."
+	if books_updated:
+		print "Books updated: "
+		for book in books_updated:
+			print "\t " + book['book name']
+	if books_skipped:
+		print "Books skipped: "
+		for book in books_skipped:
+				print "\t " + book['book name']
+
+# Get arguments from command line
+def getUpdateArguments(args, books):
+	print "Number of args: ", len(args), 'arguments'
+	print "Argument list: ", str(args)
+	if args.count == 1:
+		return "none"
+	elif "-ua" in args:
+		return "all"
+	elif "-u" in args and len(args) == 2:
+		print
+		for book in books:
+			print book['book number'] + ". " + book['book name']
+		print
+		books_to_update = raw_input("Please enter book number(s) of the book(s) you'd like to update in a comma separated list: ")
+		books_to_update = books_to_update.replace(" ", "")
+		return books_to_update.split(',')
+	else:
+		return "none"
+
+# Main
 drive_letter = findKindle()
 if drive_letter is None:
 	print "Error: Kindle not found."
@@ -219,19 +313,10 @@ else:
 	print "Kindle found..."
 	print "Getting list of books..."
 	books = getBooks(drive_letter)
-	print "Removing books that already have X-Ray files..."
-	books = removeBooksWithXRay(drive_letter, books)
-	if not books:
-		print "All books already have X-Ray files..."
+	update = getUpdateArguments(sys.argv, books)
+	print update
+	if update == "none": normalOperation(books)
+	elif update == "all": updateAllBooks(books)
 	else:
-		print "Updating ASIN for books..."
-		updateBooks(books, drive_letter)
-print "Done..."
-if books_updated:
-	print "Books updated: "
-	for book in books_updated:
-		print "\t " + book['book name']
-if books_skipped:
-	print "Books skipped: "
-	for book in books_skipped:
-		print "\t " + book['book name']
+		books_to_update = createListOfBooksToUpdate(books, update)
+		updateBooks(books_to_update)
