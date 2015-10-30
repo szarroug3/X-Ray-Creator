@@ -1,20 +1,3 @@
-"""
-* Prerequesites: 
-* 	1. Check if kindle is connected
-* Main Steps:
-* 	1. get list of books
-* 	2. get list of x-ray files
-* 	3. filter out books that already have x-ray files
-* 	4. update asin for each book left
-* 	5. run x-ray builder
-* 	6. copy x-ray file to kindle
-* Post Steps:
-*	1. Check to make sure all books have x-ray files
-* Notes:
-*	Kindle VendorID: 0x1949
-*	Kindle ProductID: 0x0004
-"""
-
 import os
 import sys
 import ctypes
@@ -308,6 +291,7 @@ def getUpdateArguments(args, books):
 	else:
 		return "none"
 
+# Print help
 def printHelp():
 	print "python xraycreatory.py [-u] [-ua]"
 	print
