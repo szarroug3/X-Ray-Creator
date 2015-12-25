@@ -251,7 +251,6 @@ def updateAllBooks(books):
 # Create a list of books from user input
 def createListOfBooksToUpdate(books, book_numbers):
 	books_to_update = []
-	print book_numbers
 	for number in book_numbers:
 		books_to_update.append(books[int(number) - 1])
 	return books_to_update
@@ -319,7 +318,6 @@ else:
 		print "Getting list of books..."
 		books = getBooks(drive_letter)
 		update = getUpdateArguments(sys.argv, books)
-		print update
 		if update == "none": normalOperation(books)
 		elif update == "all": updateAllBooks(books)
 		else:
