@@ -308,7 +308,7 @@ def printHelp():
 	print "*NOTE: -ua will take precedence over -u"
 
 # Main
-if "-h" in sys.argv or "-help" in args or "-?" in args:
+if "-h" in sys.argv or "-help" in sys.argv or "-?" in sys.argv:
 	printHelp()
 else:
 	drive_letter = findKindle()
