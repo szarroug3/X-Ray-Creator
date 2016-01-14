@@ -273,8 +273,8 @@ def updateBooks(books):
 
 # Get arguments from command line
 def getUpdateArguments(args, books):
-	if args.count == 1:
-		return "none"
+	if len(args) == 2:
+		return "normal"
 	if "--spoilers" in args:
 		spoilers = true
 	if "-ua" in args:
@@ -292,9 +292,9 @@ def getUpdateArguments(args, books):
 
 # Print help
 def printHelp():
-	print "python xraycreator.py [-u] [-ua]"
+	print "python xraycreator.py start [-u] [-ua]"
 	print
-	print "Not using any switches will search the kindle for books without X-Ray Files,"
+	print "Using only start or s will search the kindle for books without X-Ray Files,"
 	print "update the books' ASIN then create an X-Ray file for it on the kindle."
 	print
 	print "-ua\t\tDeletes all X-Ray files and recreates them"
@@ -307,9 +307,9 @@ def printHelp():
 	print "*NOTE: -ua will take precedence over -u"
 
 # Main
-if "-h" in sys.argv or "-help" in sys.argv or "-?" in sys.argv:
+if "-h" in sys.argv or "-help" in sys.argv or "-?" in sys.argv or "?" in sys.argv or len(sys.argv) == 1:
 	printHelp()
-else:
+elif "s" in sys.argv or "start" in sys.argv:
 	drive_letter = findKindle()
 	if drive_letter is None:
 		print "Error: Kindle not found."
@@ -318,8 +318,11 @@ else:
 		print "Getting list of books..."
 		books = getBooks(drive_letter)
 		update = getUpdateArguments(sys.argv, books)
-		if update == "none": normalOperation(books)
+		if update == "normal": normalOperation(books)
 		elif update == "all": updateAllBooks(books)
+		elif update == "none": printHelp()
 		else:
 			books_to_update = createListOfBooksToUpdate(books, update)
 			updateBooks(books_to_update)
+else:
+	printHelp()
