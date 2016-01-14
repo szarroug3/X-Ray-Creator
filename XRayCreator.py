@@ -292,7 +292,7 @@ def getUpdateArguments(args, books):
 
 # Print help
 def printHelp():
-	print "python xraycreatory.py [-u] [-ua]"
+	print "python xraycreator.py [-u] [-ua]"
 	print
 	print "Not using any switches will search the kindle for books without X-Ray Files,"
 	print "update the books' ASIN then create an X-Ray file for it on the kindle."
