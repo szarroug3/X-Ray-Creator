@@ -16,7 +16,7 @@ Requirements:
   * https://www.python.org/downloads/release/python-279/  
   
 Program usage:  
-python xraycreatory.py [-u] [-ua] [--spoilers]  
+python xraycreator.py [-u] [-ua] [--spoilers]  
 Not using any switches will search the kindle for books without X-Ray Files,  
 update the books' ASIN then create an X-Ray file for it on the kindle.  
   
