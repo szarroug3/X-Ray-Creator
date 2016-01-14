@@ -251,7 +251,6 @@ def updateAllBooks(books):
 # Create a list of books from user input
 def createListOfBooksToUpdate(books, book_numbers):
 	books_to_update = []
-	print book_numbers
 	for number in book_numbers:
 		books_to_update.append(books[int(number) - 1])
 	return books_to_update
@@ -293,7 +292,7 @@ def getUpdateArguments(args, books):
 
 # Print help
 def printHelp():
-	print "python xraycreatory.py [-u] [-ua]"
+	print "python xraycreator.py [-u] [-ua]"
 	print
 	print "Not using any switches will search the kindle for books without X-Ray Files,"
 	print "update the books' ASIN then create an X-Ray file for it on the kindle."
@@ -308,7 +307,7 @@ def printHelp():
 	print "*NOTE: -ua will take precedence over -u"
 
 # Main
-if "-h" in sys.argv or "-help" in args or "-?" in args:
+if "-h" in sys.argv or "-help" in sys.argv or "-?" in sys.argv:
 	printHelp()
 else:
 	drive_letter = findKindle()
@@ -319,7 +318,6 @@ else:
 		print "Getting list of books..."
 		books = getBooks(drive_letter)
 		update = getUpdateArguments(sys.argv, books)
-		print update
 		if update == "none": normalOperation(books)
 		elif update == "all": updateAllBooks(books)
 		else:
