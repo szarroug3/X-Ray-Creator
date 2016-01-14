@@ -13,7 +13,10 @@ http://www.mobileread.com/forums/showthread.php?t=21763
    
 Requirements:  
 * Python 2.7  
-  * https://www.python.org/downloads/release/python-279/  
+  * https://www.python.org/downloads/release/python-279/ 
+* BeautifulSoup4
+  * pip install beautifulsoup4
+  * http://www.crummy.com/software/BeautifulSoup/bs4/download/4.4/
   
 Program usage:  
 python xraycreator.py start [-u] [-ua] [--spoilers]  
